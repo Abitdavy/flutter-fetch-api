@@ -15,21 +15,20 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  var _dependChange = true;
+  // var _dependChange = true;
 
-  @override
-  void didChangeDependencies() {
-    if (_dependChange) {
-      Provider.of<KaryawanProvider>(context).fetchData();
-    }
-    _dependChange = false;
-    super.didChangeDependencies();
-  }
+  // @override
+  // void didChangeDependencies() {
+  //   if (_dependChange) {
+  //     Provider.of<KaryawanProvider>(context).fetchData();
+  //   }
+  //   _dependChange = false;
+  //   super.didChangeDependencies();
+  // }
 
   @override
   Widget build(BuildContext context) {
-    // final karyawanItems = Provider.of<KaryawanProvider>(context, listen: false);
-    // final karyawan = karyawanItems.items;
+    final fetchKaryawanJson = Provider.of<KaryawanProvider>(context);
     return Scaffold(
       appBar: AppBar(
         title: Text(widget.title),
@@ -87,79 +86,109 @@ class _MyHomePageState extends State<MyHomePage> {
               : ListView(
                   children: snapshot.data!
                       .map((element) => Card(
-                        elevation: 5,
-                        margin: EdgeInsets.all(12),
-                        child: Padding(
-                          padding: EdgeInsets.all(12),
-                          child: ListTile(
-                            leading: CircleAvatar(
-                              // radius: 50,
-                              backgroundImage:
-                                  AssetImage('images/Avatar-img.png'),
-                            ),
-                            title: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  element.nama,
-                                  style: TextStyle(
-                                      fontSize: 20,
-                                      fontWeight: FontWeight.bold),
+                            elevation: 5,
+                            margin: EdgeInsets.all(12),
+                            child: Padding(
+                              padding: EdgeInsets.all(12),
+                              child: ListTile(
+                                leading: CircleAvatar(
+                                  // radius: 50,
+                                  backgroundImage:
+                                      AssetImage('images/Avatar-img.png'),
                                 ),
-                                SizedBox(
-                                  height: 5,
-                                ),
-                                Text('NIK: ${element.nik}'),
-                              ],
-                            ),
-                            subtitle: Row(
-                              children: [
-                                Text('Umur: ${element.umur.toString()},'),
-                                SizedBox(
-                                  width: 5,
-                                ),
-                                Text('Kota: ${element.kota}')
-                              ],
-                            ),
-                            trailing: IconButton(
-                              onPressed: () async {
-                                await DBHelper.deleteList(element.id!);
-                                setState(() {});
-                              },
-                              icon: Icon(Icons.delete),
-                            ),
-                            onTap: () async {
-                              await Navigator.of(context).push(
-                                MaterialPageRoute(
-                                  builder: (_) => AddKaryawan(
-                                    karyawan: KaryawanModel(
-                                      id: element.id,
-                                      nik: element.nik,
-                                      nama: element.nama,
-                                      umur: element.umur,
-                                      kota: element.kota,
+                                title: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      element.nama,
+                                      style: TextStyle(
+                                          fontSize: 20,
+                                          fontWeight: FontWeight.bold),
                                     ),
-                                  ),
+                                    SizedBox(
+                                      height: 5,
+                                    ),
+                                    Text('NIK: ${element.nik}'),
+                                  ],
                                 ),
-                              );
-                              setState(() {});
-                            },
-                          ),
-                        ),
-                      ))
+                                subtitle: Row(
+                                  children: [
+                                    Text('Umur: ${element.umur.toString()},'),
+                                    SizedBox(
+                                      width: 5,
+                                    ),
+                                    Text('Kota: ${element.kota}')
+                                  ],
+                                ),
+                                trailing: IconButton(
+                                  onPressed: () async {
+                                    await DBHelper.deleteList(element.id!);
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                      SnackBar(
+                                        clipBehavior: Clip.hardEdge,
+                                        backgroundColor: Colors.red,
+                                        // behavior: SnackBarBehavior.floating,
+                                        content: Text('List Deleted'),
+                                        duration: Duration(seconds: 2),
+                                        action: SnackBarAction(
+                                          label: 'Dismiss',
+                                          textColor: Colors.white,
+                                          onPressed: () {},
+                                        ),
+                                      ),
+                                    );
+                                    setState(() {});
+                                  },
+                                  icon: Icon(Icons.delete),
+                                ),
+                                onTap: () async {
+                                  await Navigator.of(context).push(
+                                    MaterialPageRoute(
+                                      builder: (_) => AddKaryawan(
+                                        karyawan: KaryawanModel(
+                                          id: element.id,
+                                          nik: element.nik,
+                                          nama: element.nama,
+                                          umur: element.umur,
+                                          kota: element.kota,
+                                        ),
+                                      ),
+                                    ),
+                                  );
+                                  setState(() {});
+                                },
+                              ),
+                            ),
+                          ))
                       .toList(),
                 );
         },
       ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () async {
-          // await Navigator.of(context).pushNamed(AddKaryawan.routeName);
-          await Navigator.of(context).push(MaterialPageRoute(
-            builder: (_) => AddKaryawan(),
-          ));
-          setState(() {});
-        },
-        child: const Icon(Icons.add),
+      floatingActionButton: Padding(
+        padding: const EdgeInsets.only(left: 30),
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.end,
+          children: [
+            FloatingActionButton(
+              onPressed: () async {
+                await fetchKaryawanJson.fetchData();
+                setState(() {});
+              },
+              child: const Icon(Icons.add_to_queue),
+            ),
+            Expanded(child: Container()),
+            FloatingActionButton(
+              onPressed: () async {
+                // await Navigator.of(context).pushNamed(AddKaryawan.routeName);
+                await Navigator.of(context).push(MaterialPageRoute(
+                  builder: (_) => AddKaryawan(),
+                ));
+                setState(() {});
+              },
+              child: const Icon(Icons.add),
+            ),
+          ],
+        ),
       ),
     );
   }

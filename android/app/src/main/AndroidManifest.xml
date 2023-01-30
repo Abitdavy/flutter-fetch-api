@@ -1,7 +1,8 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.example.karyawan_list">
+    <uses-permission android:name="android.permission.INTERNET" />
    <application
-        android:label="karyawan_list"
+        android:label="KR List"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher">
         <activity
